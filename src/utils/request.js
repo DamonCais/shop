@@ -1,5 +1,7 @@
 import axios from 'axios'
-// import { Message, MessageBox } from 'element-ui'
+import { Message, MessageBox } from 'element-ui'
+import router from '../router'
+
 import store from '../store'
 import { getToken } from '@/utils/auth'
 import guzzuLogin from '@/components/GuzzuLogin/function.js'
@@ -13,6 +15,7 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
+  console.log(store.getters.token)
   if (store.getters.token) {
     config.headers['Access-Token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
@@ -32,15 +35,20 @@ service.interceptors.response.use(
   },
   error => {
     console.log(error.response)
-    let message
     if (error.response.status === 401) {
-      if (error.response.data.code === 'Unauthorized' || error.response.data.code === 'InvalidArgument') {
-        message = error.response.data.message
-      }
-      guzzuLogin({ username: store.getters.name, message })
-      return Promise.resolve()
+      store.dispatch('FedLogOut').then(() => {
+        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          router.push({ path: '/login' })
+        })
+        return Promise.reject(error)
+      })
+    } else {
+      return Promise.reject(error)
     }
-    return Promise.reject(error)
   }
 )
 

@@ -9,7 +9,9 @@ module.exports = function() {
     if (username === 'admin' && password === '4690') {
       const token = Math.random().toString(36).substr(2)
       client.set('access_token', token)
-      ctx.body = { token: token }
+      const at = await client.get('access_token')
+      console.log(at)
+      ctx.body = { token: token, message: 'ok' }
     } else {
       ctx.throw(400, '登录失败')
     }

@@ -1,31 +1,31 @@
 <template>
-	<div class="login-container">
-		<el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px" class="card-box login-form">
-			<h3 class="title">GUZZU Shopping Mall Admin</h3>
-			<el-form-item prop="username">
-				<span class="svg-container svg-container_login">
-					<svg-icon icon-class="user" />
-				</span>
-				<el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="login" />
-			</el-form-item>
-			<el-form-item prop="password">
-				<span class="svg-container">
-					<svg-icon icon-class="password"></svg-icon>
-				</span>
-				<el-input name="password" :type="pwdType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="password"></el-input>
-				<span class="show-pwd" @click="showPwd">
-					<svg-icon icon-class="eye" />
-				</span>
-			</el-form-item>
-			<el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
-				{{$t('LOGIN_SIGN_IN')}}
-			</el-button>
-			<div class="tips">
-				<span style="margin-right:20px;"></span>
-				<span></span>
-			</div>
-		</el-form>
-	</div>
+  <div class="login-container">
+    <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px" class="card-box login-form">
+      <h3 class="title">Shopping Mall Admin</h3>
+      <el-form-item prop="username">
+        <span class="svg-container svg-container_login">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="login" />
+      </el-form-item>
+      <el-form-item prop="password" :error="error">
+        <span class="svg-container">
+          <svg-icon icon-class="password"></svg-icon>
+        </span>
+        <el-input name="password" :type="pwdType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="password"></el-input>
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon icon-class="eye" />
+        </span>
+      </el-form-item>
+      <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
+        {{$t('LOGIN_SIGN_IN')}}
+      </el-button>
+      <div class="tips">
+        <span style="margin-right:20px;"></span>
+        <span></span>
+      </div>
+    </el-form>
+  </div>
 </template>
 
 <script>
@@ -54,6 +54,7 @@ export default {
       }
     };
     return {
+      error: "",
       loginForm: {
         // username: 'calvin@guzzu.com',
         username: "",
@@ -78,9 +79,20 @@ export default {
       }
     },
     handleLogin() {
-      doPost("/login", this.loginForm).then(res => {
-        console.log(res);
-      });
+      this.error = "";
+      this.loading = true;
+      this.$store
+        .dispatch("Login", this.loginForm)
+        .then(() => {
+          this.loading = false;
+          this.$router.push({ path: "/" });
+        })
+        .catch(err => {
+          this.loading = false;
+          this.$alert(err.response.data.message, "error message", {
+            confirmButtonText: this.$t("LOGIN_CONFIRM")
+          });
+        });
     }
   },
   computed: {

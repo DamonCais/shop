@@ -1,16 +1,22 @@
-const redis = require('redis')
+const path = require('path')
+const fs = require('fs')
 
-const client = redis.createClient(6379, 'localhost')
+const { media } = require('./model')
 
 module.exports = function() {
   return async function(ctx) {
-    const { username, password } = ctx.request.body
-    if (username === 'admin' && password === '4690') {
-      const token = Math.random().toString(36).substr(2)
-      client.set('access_token', token)
-      ctx.body = { token: token }
-    } else {
-      ctx.body = { message: '登录失败' }
-    }
+    const files = ctx.request.files.files
+    console.log(files.path)
+    const p = files.path.split('\\')
+    await addMedia('uploadDir/' + p[p.length - 1])
+    ctx.body = { message: 'success' }
   }
+}
+
+function addMedia(path) {
+  return new Promise((resolve, reject) => {
+    media.create({ path }, () => {
+      resolve()
+    })
+  })
 }

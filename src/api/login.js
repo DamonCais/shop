@@ -2,12 +2,11 @@ import request from '@/utils/request'
 
 export function login(username, password) {
   return request({
-    url: 'session',
+    url: 'login',
     method: 'post',
     data: {
-      login: username,
-      password,
-      clientType: 'mallmp.guzzu.cn'
+      username,
+      password
     }
   })
 }
@@ -22,7 +21,7 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: 'session',
-    method: 'delete'
+    url: 'logout',
+    method: 'post'
   })
 }

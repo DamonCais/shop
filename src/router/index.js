@@ -91,26 +91,26 @@ export const constantRouterMap = [{
   hidden: true
 },
 {
-  path: '/stores',
+  path: '/products',
   component: Layout,
   children: [{
     path: '',
-    name: 'stores',
+    name: 'product',
     component: () =>
-                import('@/views/store/index'),
-    meta: { title: 'STORE', icon: 'form' },
+                import('@/views/product/index'),
+    meta: { title: 'product', icon: 'form' },
     hidden: true
   }]
 },
 {
-  path: '/stores',
+  path: '/products',
   component: Layout,
   children: [{
-    path: ':id',
-    name: 'stores',
+    path: 'add',
+    name: 'product',
     component: () =>
-                import('@/views/store/store'),
-    meta: { title: 'Store', icon: 'form', backIcon: true, bread: true }
+                import('@/views/product/product'),
+    meta: { title: 'product', icon: 'form', backIcon: true, bread: true }
   }],
   hidden: true
 },

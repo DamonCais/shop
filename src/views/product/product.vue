@@ -1,0 +1,235 @@
+<template>
+	<div class="contain">
+		<el-button style="margin-bottom:20px;" @click="addOptions">添加选项</el-button>
+		<el-tabs type="card" v-model="editableTabsValue" class="tabs" tab-position="top">
+			<el-tab-pane v-for="(p,i) in product" :key="i" :name="i+''" :label="p.name||('选项'+i)">
+				<div class="form">
+					<el-form label-width="80px" label-position="right">
+						<el-form-item label="添加图片">
+							<div v-for="(logo,i) in productImgs" :key="i" class="logo" :style="'background-image:url(../dist/'+logo.path+')'"></div>
+							<div @click="getImg" class="logo plus">
+								<i class="el-icon-plus"></i>
+							</div>
+						</el-form-item>
+						<el-form-item label="名字">
+							<el-input v-model="p.name" />
+						</el-form-item>
+						<el-form-item label="价格">
+							<el-input v-model="p.price" placeholder="请输入价格">
+								<template slot="append">元</template>
+							</el-input>
+						</el-form-item>
+						<el-form-item label="库存">
+							<el-input placeholder="库存数量" v-model="quantity" class="input-with-select" :disabled="p.stock==='unlimited'">
+								<el-select v-model="p.stock" slot="prepend" placeholder="请选择">
+									<el-option label="不限量" value="unlimited"></el-option>
+									<el-option label="限量" value="limited"></el-option>
+								</el-select>
+							</el-input>
+						</el-form-item>
+					</el-form>
+				</div>
+			</el-tab-pane>
+		</el-tabs>
+		<div>{{product}}</div>
+		<imgsel :pagination="imgPagination" @pageChange="imgpageChange" @imgsel="imgsel" :imgdata="imgdata" v-model="imgDialog" />
+	</div>
+</template>
+
+<script>
+import imgsel from "@/core/imgsel";
+import { doPost, doGet, doPatch } from "@/api/api";
+
+export default {
+  computed: {
+    quantity: {
+      set(val) {
+        let index = parseInt(this.editableTabsValue);
+
+        this.product[index].quantity = val;
+      },
+      get() {
+        let index = parseInt(this.editableTabsValue);
+        return this.product[index].stock === "unlimited"
+          ? "unlimited"
+          : this.product[index].quantity;
+      }
+    }
+  },
+  data() {
+    return {
+      imgdata: [],
+      imgPagination: {
+        currentPage: 1,
+        total: 0
+      },
+      imgDialog: false,
+      productImgs: [],
+
+      editableTabsValue: "0",
+      product: [
+        {
+          Imgs: [],
+          price: null,
+          name: "",
+          stock: "limited",
+          quantity: 10
+        }
+      ]
+    };
+  },
+
+  methods: {
+    getImg() {
+      this.imgdata = [];
+      doGet(`/media.get`, {
+        p: this.imgPagination.currentPage - 1
+      }).then(res => {
+        console.log(res);
+        this.imgPagination.total = res.data.total;
+        this.imgdata = res.data.imgs;
+        this.imgDialog = true;
+      });
+    },
+    imgsel(val) {
+      console.log("imgsel" + val);
+      if (val === -1) {
+        return;
+      }
+      this.productImgs.push(this.imgdata[val]);
+      this.imgDialog = false;
+    },
+    imgpageChange(val) {
+      this.imgPagination.currentPage = val;
+      this.getImg();
+    },
+    addOptions() {
+      this.product.push({
+        Imgs: [],
+        price: null,
+        name: "",
+        stock: "limited",
+        quantity: 10
+      });
+    }
+  },
+  components: {
+    imgsel
+  }
+};
+</script>
+
+<style>
+</style>
+
+
+<style lang="scss" scoped>
+.contain {
+  min-height: 300px;
+  background: #fff;
+  // width: 1000px;
+  padding: 10px;
+  // min-height: 300px;
+  // background: #fff;
+  // padding: 20px 100px;
+  // box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  .tabs {
+    margin: 0 auto;
+  }
+  .form {
+    width: 440px;
+    .logo {
+      width: 80px;
+      height: 80px;
+      float: left;
+      margin: 0 40px 20px 0;
+      box-sizing: border-box;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      position: relative;
+      cursor: pointer;
+    }
+    .plus {
+      text-align: center;
+      line-height: 80px;
+      border: 1px dashed #999;
+    }
+  }
+  .row {
+    margin-bottom: 20px;
+    .logo {
+      width: 200px;
+      height: 200px;
+      float: left;
+      margin-right: 100px;
+      box-sizing: border-box;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      position: relative;
+      cursor: pointer;
+      h5 {
+        text-align: center;
+        width: 100%;
+        background: #666;
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        line-height: 20px;
+      }
+    }
+    .form {
+      float: left;
+      .el-form-item {
+        margin-bottom: 5px;
+      }
+    }
+    .title {
+      padding: 20px;
+      line-height: 30px;
+
+      font-size: 20px;
+    }
+  }
+  .lang {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    border: 1px solid red;
+    justify-content: space-around;
+    text-align: center;
+    span {
+      display: block;
+      padding: 5px;
+      width: 30px;
+      cursor: pointer;
+    }
+    .active {
+      background: #3f8;
+    }
+  }
+}
+.pagination {
+  margin: 5px 0;
+  float: right;
+  margin-bottom: 50px;
+}
+.btn {
+  margin: 5px 0;
+  float: right;
+}
+.clearfix {
+  clear: both;
+}
+</style>
+<style>
+.el-select .el-input {
+  width: 130px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
+</style>

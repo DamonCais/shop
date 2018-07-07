@@ -9,27 +9,21 @@ const whiteList = ['/login'] // 不重定向白名单
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
+  const token = getToken()
+  console.log(token)
+  console.log('-----')
   if (getToken()) {
     if (to.path === '/login') {
-      if (store.getters.shoppingMallId) {
-        next({ path: '/' })
-      } else {
-        next({ path: '/shoppingmallList' })
-      }
+      next({ path: '/' })
       NProgress.done()
     } else {
-      if (to.path === '/shoppingmallList') {
-        next()
-      } else if (!store.getters.shoppingMallId) {
-        next({ path: '/shoppingmallList' })
-      }
       next()
     }
   } else {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      next('/login')
+      next({ path: '/login' })
       NProgress.done()
     }
   }
