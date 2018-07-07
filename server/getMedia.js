@@ -14,7 +14,7 @@ module.exports = function() {
 
 function getMedia(p) {
   return new Promise((resolve, reject) => {
-    media.find().skip(10 * p).limit(10).exec((err, res) => {
+    media.find().skip(15 * p).limit(15).exec((err, res) => {
       resolve(res)
     })
   })

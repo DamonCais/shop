@@ -44,6 +44,8 @@ app.use(async(ctx, next) => {
             ctx.throw(code || 500, message || '服务器错误');
         };
         let at = await getToken();
+        console.log(at);
+        console.log(ctx.request.header['access-token'])
         if (ctx.request.header['access-token'] !== at && ctx.request.url !== '/login') {
             ctx.throw(401);
         }

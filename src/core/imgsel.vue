@@ -1,25 +1,25 @@
 
 <template>
-	<div>
-		<el-dialog v-loading="loading" class="dialog" :title="$t('IMAGESEL_TITLE')" :visible.sync="show" width="50%">
-			<input class="imginput" type="file" id="imginput" ref="imginput" @change="imgChange">
-			<label class="imglabel" for="imginput">
-				上传图片
-			</label>
-			<ul class="content">
-				<li v-for="(item,i) in imgdata" :key="i" class="item" :class="{'active':i===sel}">
-					<div class="img">
-						<img @click="sel=sel===i?-1:i" :src="item.path" alt="">
-					</div>
-				</li>
-			</ul>
-			<el-pagination class="pagination" @current-change="handleCurrentChange" layout="prev, pager, next" :current-page.sync="pagination.currentPage" :total="pagination.total">
-			</el-pagination>
-			<div class="clearfix"></div>
-			<el-button class="btn" @click="imgsel">{{$t('IMAGESEL_CONFIRM')}}</el-button>
-			<div class="clearfix"></div>
-		</el-dialog>
-	</div>
+  <div>
+    <el-dialog v-loading="loading" class="dialog" :title="$t('IMAGESEL_TITLE')" :visible.sync="show" width="50%">
+      <input class="imginput" type="file" id="imginput" ref="imginput" @change="imgChange">
+      <label class="imglabel" for="imginput">
+        上传图片
+      </label>
+      <ul class="content">
+        <li v-for="(item,i) in imgdata" :key="i" class="item" :class="{'active':i===sel}">
+          <div class="img">
+            <img @click="sel=sel===i?-1:i" :src="'../dist/'+item.path" alt="">
+          </div>
+        </li>
+      </ul>
+      <el-pagination class="pagination" @current-change="handleCurrentChange" layout="prev, pager, next" :page-size="pagination.pageSize" :current-page.sync="pagination.currentPage" :total="pagination.total">
+      </el-pagination>
+      <div class="clearfix"></div>
+      <el-button class="btn" @click="imgsel">{{$t('IMAGESEL_CONFIRM')}}</el-button>
+      <div class="clearfix"></div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>

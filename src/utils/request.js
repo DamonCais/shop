@@ -36,16 +36,16 @@ service.interceptors.response.use(
   error => {
     console.log(error.response)
     if (error.response.status === 401) {
-      store.dispatch('FedLogOut').then(() => {
-        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          router.push({ path: '/login' })
+      MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('FedLogOut').then(() => {
+          location.reload()
         })
-        return Promise.reject(error)
       })
+      return Promise.reject(error)
     } else {
       return Promise.reject(error)
     }
