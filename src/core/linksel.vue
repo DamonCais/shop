@@ -5,7 +5,7 @@
 			<div v-show="title==='shopping-mall-products'" class="row">
 				<span>{{$t('LINKSEL_STORE_SELECT')}}</span>
 				<el-select @change="storeIdChange" v-model="storesData.storeId">
-					<el-option v-for="item in storesData.storesList" :key="item._id" :label="item.name[editlang]" :value="item._id">
+					<el-option v-for="item in storesData.storesList" :key="item._id" :label="item.name" :value="item._id">
 					</el-option>
 				</el-select>
 			</div>

@@ -44,9 +44,9 @@ app.use(async(ctx, next) => {
             ctx.throw(code || 500, message || '服务器错误');
         };
         let at = await getToken();
-        console.log(at);
-        console.log(ctx.request.header['access-token'])
-        if (ctx.request.header['access-token'] !== at && ctx.request.url !== '/login') {
+        let whiteList = ['/login', '/page.get', '/product.get'];
+        let url = ctx.request.url.split('?')[0]
+        if (ctx.request.header['access-token'] !== at && whiteList.indexOf(url) === -1) {
             ctx.throw(401);
         }
         await next();
@@ -61,9 +61,22 @@ app.use(async(ctx, next) => {
 
 let router = new Router();
 router.post('/login', require('./login')());
-router.post('/product.add', require('./addProduct')());
-router.post('/media.add', require('./addMedia')());
-router.get('/media.get', require('./getMedia')());
+router.post('/logout', require('./logout')());
+
+router.post('/media.add', require('./media').mediaAdd());
+router.get('/media.get', require('./media').mediaGet());
+
+router.post('/product.add', require('./product').productAdd());
+router.post('/product.del', require('./product').productDel());
+router.get('/product.get', require('./product').productGet());
+
+
+router.post('/page.add', require('./page').pageAdd());
+router.post('/page.del', require('./page').pageDel());
+router.get('/page.get', require('./page').pageGet());
+router.post('/page.update', require('./page').pageUpdate());
+
+
 
 app.use(router.routes());
 

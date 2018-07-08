@@ -21,7 +21,7 @@
 						</div>
 					</div>
 					<div v-else>
-						<img v-if="item.type ==='image'" :src="scope.row|deepGet(item.prop)" alt="" style="width: 50px;height: 50px">
+						<img v-if="item.type ==='image'" :src="'dist/'+_(scope.row,item.prop)" alt="" style="width: 50px;height: 50px">
 						<span v-if="item.type ==='time'">{{scope.row|deepGet(item.prop)|_formatTime}}</span>
 
 						<span v-if="item.type ==='string'">{{scope.row|deepGet(item.prop)}}</span>
@@ -45,32 +45,32 @@
 
 <script>
 export default {
-	props: {
-		showData: {
-			type: Array,
-		},
-		gridData: {
-			type: Array,
-		}
-	},
-	data() {
-		return {}
-	},
-	methods: {
-		filterChange(e) {
-			this.$emit('filterChange', e);
-		},
-		sortChange(e) {
-			this.$emit('sortChange', e);
-		},
-		onClick(row) {
-			this.$emit('onClick', row);
-		},
-		rowClick(row) {
-			this.$emit('rowClick', row);
-		}
-	}
-}
+  props: {
+    showData: {
+      type: Array
+    },
+    gridData: {
+      type: Array
+    }
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    filterChange(e) {
+      this.$emit("filterChange", e);
+    },
+    sortChange(e) {
+      this.$emit("sortChange", e);
+    },
+    onClick(row) {
+      this.$emit("onClick", row);
+    },
+    rowClick(row) {
+      this.$emit("rowClick", row);
+    }
+  }
+};
 </script>
 
 <style>

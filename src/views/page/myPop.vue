@@ -19,60 +19,57 @@
 </template>
 
 <script>
-import { doPatch } from '@/api/api'
+import { doPost } from "@/api/api";
 
 export default {
-	props: {
-		row: {
-			type: Object
-		}
-	},
-	data() {
-		return {
-			sortIndex: this.row.sortIndex,
-			popoverVisible: false
-		}
-	},
-	methods: {
-		sortUpdate(row) {
-			console.log(row);
-			doPatch(`shopping-malls/${this.shoppingMallId}/pages/` + row._id, { sortIndex: this.sortIndex }).then(res => {
-
-				if (res.status === 200) {
-					this.$message({
-						message: 'update success',
-						type: 'success'
-					})
-					this.popoverVisible = false;
-					this.$emit('sortUpdate');
-					// window.location.reload();
-				}
-			})
-		},
-		clickStop() {
-
-		},
-		sortCancel() {
-			this.popoverVisible = false;
-			// this.sortIndex = this.row.sortIndex;
-		},
-		onClick(e) {
-			// e.target.focus();
-			// this.popoverVisible = true;
-
-		}
-	},
-	watch: {
-		popoverVisible() {
-
-			this.sortIndex = this.row.sortIndex;
-			setTimeout(() => {
-				this.$refs.sort.focus();
-				console.log(this.$refs.sort);
-			}, 200);
-		}
-	}
-}
+  props: {
+    row: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      sortIndex: this.row.sortIndex,
+      popoverVisible: false
+    };
+  },
+  methods: {
+    sortUpdate(row) {
+      console.log(row);
+      doPost(`page.update`, { id: row._id, sortIndex: this.sortIndex }).then(
+        res => {
+          if (res.status === 200) {
+            this.$message({
+              message: "update success",
+              type: "success"
+            });
+            this.popoverVisible = false;
+            this.$emit("sortUpdate");
+            // window.location.reload();
+          }
+        }
+      );
+    },
+    clickStop() {},
+    sortCancel() {
+      this.popoverVisible = false;
+      // this.sortIndex = this.row.sortIndex;
+    },
+    onClick(e) {
+      // e.target.focus();
+      // this.popoverVisible = true;
+    }
+  },
+  watch: {
+    popoverVisible() {
+      this.sortIndex = this.row.sortIndex;
+      setTimeout(() => {
+        this.$refs.sort.focus();
+        console.log(this.$refs.sort);
+      }, 200);
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

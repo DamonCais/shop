@@ -1,59 +1,59 @@
 <template>
-	<div class="carousel-wrap" id="carousel">
-		<img style="width:100%;z-index:-1;opacity:0" :src="_(block.items[0],'image.url')" alt="">
-		<transition-group tag="ul" class='slide-ul' name="list">
-			<li v-for="(item,index) in block.items" :key="index" v-show="index===currentIndex" @mouseenter="stop" @mouseleave="go">
-				<div :class="block.template" :style="'background-image:url('+_(item,'image.url')+')'">
-				</div>
-			</li>
-		</transition-group>
-		<div class="carousel-items">
-			<span v-for="(item,index) in block.items.length" :key="index" :class="{'active':index===currentIndex}" @mouseover="change(index)"></span>
-		</div>
-	</div>
+  <div class="carousel-wrap" id="carousel">
+    <img style="width:100%;z-index:-1;opacity:0" :src="'dist/'+(_(block.items[0],'image.path')||'temp.webp')" alt="">
+    <transition-group tag="ul" class='slide-ul' name="list">
+      <li v-for="(item,index) in block.items" :key="index" v-show="index===currentIndex" @mouseenter="stop" @mouseleave="go">
+        <div :class="block.template" :style="'background-image:url(dist/'+(_(item,'image.path')||'temp.webp')+')'">
+        </div>
+      </li>
+    </transition-group>
+    <div class="carousel-items">
+      <span v-for="(item,index) in block.items.length" :key="index" :class="{'active':index===currentIndex}" @mouseover="change(index)"></span>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-	props: {
-		block: {
-			type: Object,
-		}
-	},
-	data() {
-		return {
-			currentIndex: 0,
-			timer: ''
-		}
-	},
-	methods: {
-		go() {
-			// this.timer = setInterval(() => {
-			// 	this.autoPlay()
-			// }, 4000)
-		},
-		stop() {
-			// clearInterval(this.timer)
-			// this.timer = null
-		},
-		change(index) {
-			this.currentIndex = index
-		},
-		autoPlay() {
-			this.currentIndex++
-			if (this.currentIndex > this.block.items.length - 1) {
-				this.currentIndex = 0
-			}
-		}
-	},
-	created() {
-		this.$nextTick(() => {
-			this.timer = setInterval(() => {
-				this.autoPlay()
-			}, 4000)
-		})
-	}
-}
+  props: {
+    block: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      currentIndex: 0,
+      timer: ""
+    };
+  },
+  methods: {
+    go() {
+      // this.timer = setInterval(() => {
+      // 	this.autoPlay()
+      // }, 4000)
+    },
+    stop() {
+      // clearInterval(this.timer)
+      // this.timer = null
+    },
+    change(index) {
+      this.currentIndex = index;
+    },
+    autoPlay() {
+      this.currentIndex++;
+      if (this.currentIndex > this.block.items.length - 1) {
+        this.currentIndex = 0;
+      }
+    }
+  },
+  created() {
+    this.$nextTick(() => {
+      this.timer = setInterval(() => {
+        this.autoPlay();
+      }, 4000);
+    });
+  }
+};
 </script>
 
 <style lang="scss" scoped>

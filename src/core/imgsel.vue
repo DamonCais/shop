@@ -9,7 +9,7 @@
       <ul class="content">
         <li v-for="(item,i) in imgdata" :key="i" class="item" :class="{'active':i===sel}">
           <div class="img">
-            <img @click="sel=sel===i?-1:i" :src="'../dist/'+item.path" alt="">
+            <img @click="sel=sel===i?-1:i" :src="'dist/'+item.path" alt="">
           </div>
         </li>
       </ul>

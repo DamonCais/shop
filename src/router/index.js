@@ -27,12 +27,12 @@ export const constantRouterMap = [{
             import('@/views/login/index'),
   hidden: true
 },
-{
-  path: '/shoppingmallList',
-  component: () =>
-            import('@/views/shoppingmall/index'),
-  hidden: true
-},
+  // {
+  //   path: '/shoppingmallList',
+  //   component: () =>
+  //             import('@/views/shoppingmall/index'),
+  //   hidden: true
+  // },
 {
   path: '/preview/:id',
   name: 'Preview',
@@ -106,7 +106,7 @@ export const constantRouterMap = [{
   path: '/products',
   component: Layout,
   children: [{
-    path: 'add',
+    path: ':id',
     name: 'product',
     component: () =>
                 import('@/views/product/product'),
@@ -114,55 +114,55 @@ export const constantRouterMap = [{
   }],
   hidden: true
 },
-{
-  path: '/categories',
-  component: Layout,
-  children: [{
-    path: '',
-    name: 'categories',
-    component: () =>
-                import('@/views/category/index'),
-    meta: { title: 'CATEGORY', icon: 'form' },
-    hidden: true
-  }]
-},
-{
-  path: '/categories',
-  component: Layout,
-  children: [{
-    path: ':id',
-    name: 'categories',
-    component: () =>
-                import('@/views/category/category'),
-    meta: { title: 'CATEGORY', icon: 'form', backIcon: true, bread: true }
-  }],
-  hidden: true
-},
-{
-  path: '/orders',
-  component: Layout,
-  // redirect: '/orders',
+  // {
+  //   path: '/categories',
+  //   component: Layout,
+  //   children: [{
+  //     path: '',
+  //     name: 'categories',
+  //     component: () =>
+  //                 import('@/views/category/index'),
+  //     meta: { title: 'CATEGORY', icon: 'form' },
+  //     hidden: true
+  //   }]
+  // },
+  // {
+  //   path: '/categories',
+  //   component: Layout,
+  //   children: [{
+  //     path: ':id',
+  //     name: 'categories',
+  //     component: () =>
+  //                 import('@/views/category/category'),
+  //     meta: { title: 'CATEGORY', icon: 'form', backIcon: true, bread: true }
+  //   }],
+  //   hidden: true
+  // },
+  // {
+  //   path: '/orders',
+  //   component: Layout,
+  //   // redirect: '/orders',
 
-  children: [{
-    path: '',
-    name: 'orders',
-    component: () =>
-                import('@/views/orders/index'),
-    meta: { title: 'ORDERS', icon: 'form' }
-  }]
-},
-{
-  path: '/orders',
-  component: Layout,
-  children: [{
-    path: ':id',
-    name: 'orders',
-    component: () =>
-                import('@/views/orders/order'),
-    meta: { title: 'Orders', icon: 'form', backIcon: true, bread: true }
-  }],
-  hidden: true
-},
+  //   children: [{
+  //     path: '',
+  //     name: 'orders',
+  //     component: () =>
+  //                 import('@/views/orders/index'),
+  //     meta: { title: 'ORDERS', icon: 'form' }
+  //   }]
+  // },
+  // {
+  //   path: '/orders',
+  //   component: Layout,
+  //   children: [{
+  //     path: ':id',
+  //     name: 'orders',
+  //     component: () =>
+  //                 import('@/views/orders/order'),
+  //     meta: { title: 'Orders', icon: 'form', backIcon: true, bread: true }
+  //   }],
+  //   hidden: true
+  // },
   // {
   //   path: '/shoppingmall',
   //   component: Layout,

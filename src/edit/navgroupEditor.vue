@@ -14,19 +14,19 @@
 				<div @mouseover="del=i" @mouseout="del=-1" v-for="(item,i) in block.items" :key="i" class="imgform" :class="{'text-only':block.template==='text-only'}">
 					<i v-show="del===i" @click="itemDel(i)" class="el-icon-error del"></i>
 					<div class="addimg" v-show="block.template!=='text-only'">
-						<div class="icon" @click="imgChange(i)" :style="'background-image:url('+_(item,'image.url')+')'">
-							<i v-if="!item.image.url" class="el-icon-plus"></i>
-							<h6 v-if="!item.image.url">{{$t('NAVGROUP_IMAGE_ADD')}}</h6>
-							<h5 v-if="item.image.url">{{$t('NAVGROUP_IMAGE_CHANGE')}}</h5>
+						<div class="icon" @click="imgChange(i)" :style="'background-image:url(dist/'+_(item,'image.path')+')'">
+							<i v-if="!item.image.path" class="el-icon-plus"></i>
+							<h6 v-if="!item.image.path">{{$t('NAVGROUP_IMAGE_ADD')}}</h6>
+							<h5 v-if="item.image.path">{{$t('NAVGROUP_IMAGE_CHANGE')}}</h5>
 						</div>
 					</div>
 					<div class="row" v-show="block.template!=='image-only'">
 						<label for="">{{$t('NAVGROUP_TITLE')}}</label>
-						<input :placeholder="editlang==='en'?'please input':'请输入标题'" v-model="item.title[editlang]" type="text">
+						<input placeholder="请输入标题" v-model="item.title" type="text">
 					</div>
-					<div class="row">
+					<!-- <div class="row">
 						<linktype :storesData="storesData" :item="item" />
-					</div>
+					</div> -->
 				</div>
 			</transition-group>
 		</draggable>
@@ -34,100 +34,100 @@
 			<i class="el-icon-plus"></i>
 			<h6>{{$t('NAVGROUP_ADD_A_NAV')}}</h6>
 		</div>
+
 		<imgsel :pagination="pagination" @pageChange="pageChange" @imgsel="imgsel" :imgdata="imgdata" v-model="dialogVisible" />
 	</div>
 </template>
 
 <script>
-import draggable from 'vuedraggable'
-import imgsel from '@/core/imgsel'
-import linktype from '@/core/linktype'
-import { doPost, doGet } from '@/api/api'
+import draggable from "vuedraggable";
+import imgsel from "@/core/imgsel";
+import linktype from "@/core/linktype";
+import { doPost, doGet } from "@/api/api";
 export default {
-	props: {
-		block: {
-			type: Object,
-		},
-		storesData: {
-			type: Object
-		}
-	},
+  props: {
+    block: {
+      type: Object
+    },
+    storesData: {
+      type: Object
+    }
+  },
 
-	data() {
-		return {
-			dragOptions: {
-				animation: 120,
-				scroll: true,
-				group: 'sortlist',
-				ghostClass: 'ghost-style'
-			},
-			dialogVisible: false,
-			selvalue: 'beijing',
-			del: -1,
-			imgdata: [],
-			sel: -1,
-			pagination: {
-				currentPage: 1,
-				total: 50,
-			},
-		}
-	},
-	methods: {
-
-		linkType(linktype) {
-			console.log(linktype);
-		},
-		onSubmit() {
-			console.log('submit!');
-		},
-		itemDel(i) {
-			this.block.items.splice(i, 1);
-		},
-		itemAdd() {
-			this.block.items.push({
-				image: {
-					url: "https://img.yzcdn.cn/public_files/2018/01/30/585dae8447d80013ef9344adc973c6ee.png?imageView2/2/w/520/h/0/q/75/format/webp"
-				},
-				title: {
-					zh: "",
-					en: ""
-				}
-			})
-		},
-		imgChange(i) {
-			this.sel = i;
-			this.getImg();
-		},
-		imgsel(val) {
-			if (val === -1) {
-				return;
-			}
-			this.dialogVisible = false;
-			let item = this.block.items[this.sel];
-			item.image = this.imgdata[val].image;
-			this.block.items.splice(this.sel, 1, item);
-			// this.block.items[this.sel].imgsrc = this.imgdata[val].image.url;
-		},
-		getImg() {
-			this.imgdata = [];
-			doGet(`shopping-malls/${this.shoppingMallId}/medias`, { p: this.pagination.currentPage - 1 }).then(res => {
-				console.log(res);
-				this.pagination.total = parseInt(res.headers['x-total-count']);
-				this.imgdata = res.data;
-				this.dialogVisible = true;
-			})
-		},
-		pageChange(val) {
-			this.pagination.currentPage = val;
-			this.getImg();
-		},
-	},
-	components: {
-		imgsel,
-		draggable,
-		linktype
-	}
-}
+  data() {
+    return {
+      dragOptions: {
+        animation: 120,
+        scroll: true,
+        group: "sortlist",
+        ghostClass: "ghost-style"
+      },
+      dialogVisible: false,
+      selvalue: "beijing",
+      del: -1,
+      imgdata: [],
+      sel: -1,
+      pagination: {
+        currentPage: 1,
+        total: 50,
+        pageSize: 15
+      }
+    };
+  },
+  methods: {
+    linkType(linktype) {
+      console.log(linktype);
+    },
+    onSubmit() {
+      console.log("submit!");
+    },
+    itemDel(i) {
+      this.block.items.splice(i, 1);
+    },
+    itemAdd() {
+      this.block.items.push({
+        image: {
+          url:
+            "https://img.yzcdn.cn/public_files/2018/01/30/585dae8447d80013ef9344adc973c6ee.png?imageView2/2/w/520/h/0/q/75/format/webp"
+        },
+        title: ""
+      });
+    },
+    imgChange(i) {
+      this.sel = i;
+      this.getImg();
+    },
+    imgsel(val) {
+      if (val === -1) {
+        return;
+      }
+      this.dialogVisible = false;
+      let item = this.block.items[this.sel];
+      item.image = this.imgdata[val];
+      this.block.items.splice(this.sel, 1, item);
+      // this.block.items[this.sel].imgsrc = this.imgdata[val].image.path;
+    },
+    getImg() {
+      this.imgdata = [];
+      doGet(`/media.get`, {
+        p: this.pagination.currentPage - 1
+      }).then(res => {
+        this.pagination.total = res.data.total;
+        this.imgdata = res.data.imgs;
+        this.dialogVisible = true;
+      });
+    },
+    pageChange(val) {
+      this.pagination.currentPage = val;
+      this.getImg();
+    }
+  },
+  components: {
+    imgsel,
+    draggable,
+    linktype
+  }
+};
 </script>
 
 <style lang="scss" scoped>

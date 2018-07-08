@@ -4,7 +4,7 @@
 			<el-form-item :label="$t('PRODUCT_GROUP_SOURCE')">
 				<el-radio-group v-model="block.source">
 					<el-radio label="product">{{$t('PRODUCT_GROUP_PRODUCT')}}</el-radio>
-					<el-radio label="shoppingMallCategory">{{$t('PRODUCT_GROUP_SHOPPING_MALL_CATEGORY')}}</el-radio>
+					<!-- <el-radio label="shoppingMallCategory">{{$t('PRODUCT_GROUP_SHOPPING_MALL_CATEGORY')}}</el-radio> -->
 				</el-radio-group>
 			</el-form-item>
 
@@ -12,32 +12,15 @@
 				<span>{{$t('PRODUCT_GROUP_PRODUCT_SELECT')}}</span>
 				<div class="imgs">
 					<draggable :options="dragOptions" v-model="block.items">
-						<div class="img" v-for="(item,i) in block.items" :key="i" :style="'background-image:url('+_(item,'image.url')+')'" @mouseover="del=i" @mouseout="del=-1">
+						<div class="img" v-for="(item,i) in block.items" :key="i" :style="'background-image:url(dist/'+_(item,'img.path')+')'" @mouseover="del=i" @mouseout="del=-1">
 							<i v-show="del===i" @click="itemDel(i)" class="el-icon-error del"></i>
 						</div>
 					</draggable>
-					<div @click="shoppingmallStoresGet" class="plus">
+					<div @click="productsGet" class="plus">
 						<i class="el-icon-plus"></i>
 					</div>
 				</div>
 			</div>
-			<div v-show="block.source==='shoppingMallCategory'" class="category">
-				<div class="row">
-					{{$t('PRODUCT_GROUP_SHOPPING_MALL_CATEGORY')}}:
-					<span v-show="shoppingMallCategoryId" class="span">
-						{{shoppingMallCategoryId}}
-						<i @click="shoppingMallCategoryDel" class="el-icon-close"></i>
-					</span>
-					<span @click="shoppingMallCategoryGet" style="color:#38f;font-size:12px;cursor:pointer;">{{block.shoppingMallCategory?'修改':'从商品分组中选择'}}</span>
-				</div>
-				<div class="row">
-					{{$t('PRODUCT_GROUP_LIMIT')}}:
-					<input v-model="block.limit" type="text">
-					<span style="color:#aaa;">{{$t('PRODUCT_GROUP_LESS_THAN')}}50</span>
-				</div>
-
-			</div>
-
 			<el-form-item :label="$t('PRODUCT_GROUP_TEMPLATE')">
 				<el-radio-group v-model="block.template">
 					<el-radio label="single">{{$t('PRODUCT_GROUP_SINGLE')}}</el-radio>
@@ -55,159 +38,169 @@
 			</el-form-item> -->
 		</el-form>
 		<!--商品选择  -->
-		<productsel ref="productsel" :title="dialogTitle" :pagination="pagination" :storesData="storesData" @sortChange="sortChange" @productsel="productsel" v-model="dialogVisible" :multi="multi" :showData="showData" :gridData="gridData" />
+		<productsel ref="productsel" :title="dialogTitle" :pagination="pagination" @sortChange="sortChange" @productsel="productsel" v-model="dialogVisible" :multi="multi" :showData="showData" :gridData="gridData" />
 		<!-- 商品分组选择 -->
 
 	</div>
 </template>
 
 <script>
-import draggable from 'vuedraggable'
+import draggable from "vuedraggable";
 
-import productsel from '@/core/productsel'
-import { doPost, doGet } from '@/api/api'
+import productsel from "@/core/productsel";
+import { doPost, doGet } from "@/api/api";
 export default {
-	props: {
-		block: {
-			type: Object,
-		}
-	},
-	data() {
-		return {
-			dragOptions: {
-				animation: 120,
-				scroll: true,
-				group: 'sortlist',
-				ghostClass: 'ghost-style'
-			},
-			dialogVisible: false,
-			dialogTitle: '选择商品',
-			multi: true,
-			showData: [],
-			productData: [
-				{ prop: 'image.url', label: 'image', width: 120, type: 'image' },
-				{ prop: 'name.en', label: 'name', width: 120, type: 'string' },
-				{ prop: 'price', label: 'price', width: 120, type: 'price' },
-			],
-			shoppingmallpageData: [
-				{ prop: 'pageTitle.en', label: 'pageTitle', width: 120, type: 'string' },
-				{ prop: 'createdAt', label: 'createdAt', width: 120, type: 'string' },
-				{ prop: 'status', label: 'status', width: 120, type: 'string' },
-			],
-			shoppingmallcategoryData: [
-				{ prop: 'image.url', label: 'image', width: 120, type: 'image' },
-				{ prop: 'name.en', label: 'name', width: 120, type: 'string' },
-				{ prop: 'products.length', label: 'quantity', width: 120, type: 'string' },
-			],
-			gridData: [],
-			storesData: {
-				storesList: [],
-				storeId: '',
-			},
+  props: {
+    block: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      dragOptions: {
+        animation: 120,
+        scroll: true,
+        group: "sortlist",
+        ghostClass: "ghost-style"
+      },
+      dialogVisible: false,
+      dialogTitle: "选择商品",
+      multi: true,
+      showData: [],
+      productData: [
+        { prop: "img.path", label: "image", width: 120, type: "image" },
+        { prop: "name", label: "name", width: 120, type: "string" },
+        { prop: "options[0].price", label: "price", width: 120, type: "price" }
+      ],
+      shoppingmallpageData: [
+        {
+          prop: "pageTitle.en",
+          label: "pageTitle",
+          width: 120,
+          type: "string"
+        },
+        { prop: "createdAt", label: "createdAt", width: 120, type: "string" },
+        { prop: "status", label: "status", width: 120, type: "string" }
+      ],
+      shoppingmallcategoryData: [
+        { prop: "image.url", label: "image", width: 120, type: "image" },
+        { prop: "name.en", label: "name", width: 120, type: "string" },
+        {
+          prop: "products.length",
+          label: "quantity",
+          width: 120,
+          type: "string"
+        }
+      ],
+      gridData: [],
+      storesData: {
+        storesList: [],
+        storeId: ""
+      },
 
-			pagination: {
-				currentPage: 1,
-				total: 50,
-			},
-			shoppingMallCategoryId: this.block.shoppingMallCategory,
-			del: -1,
-		}
-	},
-	methods: {
-		shoppingMallCategoryDel() {
-			delete this.block.shoppingMallCategory
-			this.shoppingMallCategoryId = '';
-		},
-		itemDel(i) {
-			this.block.items.splice(i, 1);
-		},
-		productsel(products) {
-			switch (this.block.source) {
-				case 'product':
-					products.forEach(element => {
-						this.block.items.push({
-							image: this._(element, 'image'),
-							name: element.name,
-							price: element.price,
-							product: element._id,
-						})
-					});
-					break;
-				case 'shoppingMallCategory':
-					this.categoryname = products[0]['name']['en']
-					this.block.shoppingMallCategory = products[0]['_id'];
-					this.shoppingMallCategoryId = this.block.shoppingMallCategory;
-					break;
-			}
-			this.dialogVisible = false;
-		},
-		productAdd() {
-			this.multi = true;
-			this.dialogTitle = '选择商品';
-			this.gridData = [];
-			this.showData = this.productData;
-			doGet('/products', { p: this.pagination.currentPage - 1 }).then(res => {
-				this.pagination.total = parseInt(res.headers['x-total-count']);
-				this.gridData = res.data;
-				this.dialogVisible = true;
-				setTimeout(() => {
-					this.$refs.productsel.toggleSelection();
-				}, 20);
-
-			})
-		},
-		shoppingmallStoreProductGet() {
-			this.multi = true;
-			this.dialogTitle = '选择商品';
-			this.gridData = [];
-			this.showData = this.productData;
-			doGet(`shopping-malls/${this.shoppingMallId}/stores/${this.storesData['storeId']}/products`, { p: this.pagination.currentPage - 1 }).then(res => {
-				this.pagination.total = parseInt(res.headers['x-total-count']);
-				this.gridData = res.data;
-				this.dialogVisible = true;
-				setTimeout(() => {
-					this.$refs.productsel.toggleSelection();
-				}, 20);
-			})
-		},
-		shoppingmallStoresGet() {
-			doGet(`shopping-malls/${this.shoppingMallId}/stores`, { p: 0 }).then(res => {
-				this.storesData = {
-					storesList: res.data,
-					storeId: res.data[0]['_id'],
-				}
-				this.shoppingmallStoreProductGet();
-			})
-		},
-		shoppingMallCategoryGet() {
-			this.multi = false;
-			this.dialogTitle = '选择分组';
-			this.gridData = [];
-			this.showData = this.shoppingmallcategoryData;
-			doGet(`shopping-malls/${this.shoppingMallId}/categories`, { p: this.pagination.currentPage - 1 }).then(res => {
-				this.pagination.total = parseInt(res.headers['x-total-count']);
-				this.gridData = res.data;
-				this.dialogVisible = true;
-			})
-		},
-		pageChange(val) {
-			this.pagination.currentPage = val;
-			this.shoppingmallStoreProductGet();
-		},
-		storeIdChange(val) {
-			this.pagination.currentPage = 1;
-			this.shoppingmallStoreProductGet();
-		},
-		sortChange(page) {
-			this.pagination.currentPage = page;
-			this.shoppingmallStoreProductGet();
-		}
-	},
-	components: {
-		productsel,
-		draggable
-	},
-}
+      pagination: {
+        currentPage: 1,
+        total: 50
+      },
+      shoppingMallCategoryId: this.block.shoppingMallCategory,
+      del: -1
+    };
+  },
+  methods: {
+    productsGet() {
+      this.gridData = [];
+      doGet("/product.get", { p: this.pagination.currentPage - 1 }).then(
+        res => {
+          this.gridData = res.data.products;
+          this.pagination.total = res.data.total;
+          this.dialogVisible = true;
+          this.showData = this.productData;
+        }
+      );
+    },
+    itemDel(i) {
+      this.block.items.splice(i, 1);
+    },
+    productsel(products) {
+      console.log(products);
+      this.block.items.push(...products);
+      this.dialogVisible = false;
+    },
+    productAdd() {
+      this.multi = true;
+      this.dialogTitle = "选择商品";
+      this.gridData = [];
+      this.showData = this.productData;
+      doGet("/products", { p: this.pagination.currentPage - 1 }).then(res => {
+        this.pagination.total = parseInt(res.headers["x-total-count"]);
+        this.gridData = res.data;
+        this.dialogVisible = true;
+        setTimeout(() => {
+          this.$refs.productsel.toggleSelection();
+        }, 20);
+      });
+    },
+    shoppingmallStoreProductGet() {
+      this.multi = true;
+      this.dialogTitle = "选择商品";
+      this.gridData = [];
+      this.showData = this.productData;
+      doGet(
+        `shopping-malls/${this.shoppingMallId}/stores/${
+          this.storesData["storeId"]
+        }/products`,
+        { p: this.pagination.currentPage - 1 }
+      ).then(res => {
+        this.pagination.total = parseInt(res.headers["x-total-count"]);
+        this.gridData = res.data;
+        this.dialogVisible = true;
+        setTimeout(() => {
+          this.$refs.productsel.toggleSelection();
+        }, 20);
+      });
+    },
+    shoppingmallStoresGet() {
+      doGet(`shopping-malls/${this.shoppingMallId}/stores`, { p: 0 }).then(
+        res => {
+          this.storesData = {
+            storesList: res.data,
+            storeId: res.data[0]["_id"]
+          };
+          this.shoppingmallStoreProductGet();
+        }
+      );
+    },
+    shoppingMallCategoryGet() {
+      this.multi = false;
+      this.dialogTitle = "选择分组";
+      this.gridData = [];
+      this.showData = this.shoppingmallcategoryData;
+      doGet(`shopping-malls/${this.shoppingMallId}/categories`, {
+        p: this.pagination.currentPage - 1
+      }).then(res => {
+        this.pagination.total = parseInt(res.headers["x-total-count"]);
+        this.gridData = res.data;
+        this.dialogVisible = true;
+      });
+    },
+    pageChange(val) {
+      this.pagination.currentPage = val;
+      this.shoppingmallStoreProductGet();
+    },
+    storeIdChange(val) {
+      this.pagination.currentPage = 1;
+      this.shoppingmallStoreProductGet();
+    },
+    sortChange(page) {
+      this.pagination.currentPage = page;
+      this.shoppingmallStoreProductGet();
+    }
+  },
+  components: {
+    productsel,
+    draggable
+  }
+};
 </script>
 
 <style lang="scss" scoped>

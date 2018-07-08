@@ -13,8 +13,8 @@
 								</td>
 								<td>
 									<div style="vertical-align:middle;">
-										<div>{{item.name[editlang]||item.name.en+'(en)'}}</div>
-										<div v-if="item.optionName.en">{{item.optionName[editlang]||item.optionName.en+'(en)'}}</div>
+										<div>{{item.name||item.name.en+'(en)'}}</div>
+										<div v-if="item.optionName.en">{{item.optionName||item.optionName.en+'(en)'}}</div>
 									</div>
 
 								</td>

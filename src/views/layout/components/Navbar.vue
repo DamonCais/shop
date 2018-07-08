@@ -17,9 +17,6 @@
 					<i class="el-icon-caret-bottom"></i>
 				</div>
 				<el-dropdown-menu class="user-dropdown" slot="dropdown">
-					<el-dropdown-item>
-						<span @click="shoppingmallSel" style="display:block;">切换商城</span>
-					</el-dropdown-item>
 					<el-dropdown-item divided>
 						<span @click="logout" style="display:block;">LogOut</span>
 					</el-dropdown-item>
@@ -30,59 +27,53 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import LangSelect from '@/components/LangSelect'
+import { mapGetters } from "vuex";
+import Breadcrumb from "@/components/Breadcrumb";
+import Hamburger from "@/components/Hamburger";
+import LangSelect from "@/components/LangSelect";
 export default {
-	components: {
-		Breadcrumb,
-		Hamburger,
-		LangSelect
-	},
-	data() {
-		return {
-		}
-	},
-	computed: {
-		...mapGetters([
-			'sidebar',
-			'avatar',
-			'name',
-		]),
-		theme: {
-			get() {
-				return this.themeColor
-
-			},
-			set(val) {
-				this.$store.dispatch('setThemeColor', val);
-			}
-		}
-	},
-	methods: {
-		toggleSideBar() {
-			this.$store.dispatch('ToggleSideBar')
-			// 禁止缩放
-		},
-		logout() {
-			this.$store.dispatch('LogOut').then(() => {
-				location.reload() // 为了重新实例化vue-router对象 避免bug
-			})
-		},
-		shoppingmallSel() {
-			this.$router.push({ path: '/shoppingmallList' })
-		},
-		handleSetLanguage(lang) {
-			this.$i18n.locale = lang
-			this.$store.dispatch('setLanguage', lang)
-			this.$message({
-				message: 'switch language success',
-				type: 'success'
-			})
-		}
-	}
-}
+  components: {
+    Breadcrumb,
+    Hamburger,
+    LangSelect
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    ...mapGetters(["sidebar", "avatar", "name"]),
+    theme: {
+      get() {
+        return this.themeColor;
+      },
+      set(val) {
+        this.$store.dispatch("setThemeColor", val);
+      }
+    }
+  },
+  methods: {
+    toggleSideBar() {
+      this.$store.dispatch("ToggleSideBar");
+      // 禁止缩放
+    },
+    logout() {
+      this.$store.dispatch("LogOut").then(() => {
+        location.reload(); // 为了重新实例化vue-router对象 避免bug
+      });
+    },
+    shoppingmallSel() {
+      this.$router.push({ path: "/shoppingmallList" });
+    },
+    handleSetLanguage(lang) {
+      this.$i18n.locale = lang;
+      this.$store.dispatch("setLanguage", lang);
+      this.$message({
+        message: "switch language success",
+        type: "success"
+      });
+    }
+  }
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

@@ -1,14 +1,29 @@
 <template>
   <div class="contain">
-    <el-button style="margin-bottom:20px;" @click="addOptions">添加选项</el-button>
-    <el-button @click="productSave" type="success">保存</el-button>
-    <el-button @click="productReinit" type="danger">重置</el-button>
+
+    <div class="form">
+      <el-form label-width="80px" label-position="right">
+        <el-form-item label="商品名称">
+          <el-input v-model="product.name"></el-input>
+        </el-form-item>
+        <el-form-item label="选择图片">
+          <div v-if="product.img.path" class='logo' @click="getImg(-2)" @mouseover="del=-2" @mouseout="del=-1" :style="'background-image:url(dist/'+_(product,'img.path')+')'">
+            <i v-show="del===-2" @click.stop="imgDel(-2)" class="el-icon-error del"></i>
+            <span v-show="del===-2" class='imgTxt'>更换图片</span>
+          </div>
+          <div v-else @click="getImg(-2)" class="logo plus">
+            <i class="el-icon-plus"></i>
+          </div>
+        </el-form-item>
+      </el-form>
+    </div>
+
     <el-tabs type="card" v-model="editableTabsValue" class="tabs" tab-position="top" closable @tab-remove="removeTab">
-      <el-tab-pane v-for="(p,i) in product" :key="i" :name="i+''" :label="p.name||('选项'+i)">
+      <el-tab-pane v-for="(p,i) in product.options" :key="i" :name="i+''" :label="p.name||('选项'+i)">
         <div class="form">
           <el-form label-width="80px" label-position="right">
             <el-form-item label="添加图片">
-              <div v-for="(logo,i) in p.Imgs" :key="i" class="logo" @mouseover="del=i" @mouseout="del=-1" @click="getImg(i)" :style="'background-image:url(../dist/'+logo.path+')'">
+              <div v-for="(logo,i) in p.Imgs" :key="i" class="logo" @mouseover="del=i" @mouseout="del=-1" @click="getImg(i)" :style="'background-image:url(dist/'+logo.path+')'">
                 <i v-show="del===i" @click.stop="imgDel(i)" class="el-icon-error del"></i>
                 <span v-show="del===i" class='imgTxt'>更换图片</span>
               </div>
@@ -16,7 +31,7 @@
                 <i class="el-icon-plus"></i>
               </div>
             </el-form-item>
-            <el-form-item label="名字">
+            <el-form-item label="选项名称">
               <el-input v-model="p.name" />
             </el-form-item>
             <el-form-item label="价格">
@@ -38,8 +53,11 @@
     </el-tabs>
 
     <div class="mt-4">
-
+      <el-button style="margin-bottom:20px;" @click="addOptions">添加选项</el-button>
+      <el-button @click="productSave" type="success">保存</el-button>
+      <el-button @click="productReinit" type="danger">重置</el-button>
     </div>
+
     <imgsel :pagination="imgPagination" @pageChange="imgpageChange" @imgsel="imgsel" :imgdata="imgdata" v-model="imgDialog" />
   </div>
 </template>
@@ -48,17 +66,23 @@
 import imgsel from "@/core/imgsel";
 import { doPost, doGet, doPatch } from "@/api/api";
 export default {
+  mounted() {
+    console.log(this.$route.params.id);
+    if (this.$route.params.id !== "add") {
+      this.productGet(this.$route.params.id);
+    }
+  },
   computed: {
     quantity: {
       set(val) {
         let index = parseInt(this.editableTabsValue);
-        this.product[index].quantity = val;
+        this.product.options[index].quantity = val;
       },
       get() {
         let index = parseInt(this.editableTabsValue);
-        return this.product[index].stock === "unlimited"
+        return this.product.options[index].stock === "unlimited"
           ? "unlimited"
-          : this.product[index].quantity;
+          : this.product.options[index].quantity;
       }
     }
   },
@@ -73,38 +97,53 @@ export default {
         pageSize: 15
       },
       imgDialog: false,
-      productImgs: [],
-
       editableTabsValue: "0",
-      product: [
-        {
-          Imgs: [],
-          price: null,
-          name: "",
-          stock: "limited",
-          quantity: 10
-        }
-      ]
+      product: {
+        name: "",
+        img: {},
+        options: [
+          {
+            Imgs: [],
+            price: null,
+            name: "",
+            stock: "limited",
+            quantity: 10
+          }
+        ]
+      }
     };
   },
 
   methods: {
-    productSave() {
-      doPost("/product.add", { product: this.product }).then(res => {
+    productGet(id) {
+      doGet("/product.get", { id }).then(res => {
         console.log(res);
+        this.product = res.data.products[0];
+      });
+    },
+    productSave() {
+      doPost("/product.add", {
+        product: this.product,
+        id: this.$route.params.id
+      }).then(res => {
+        this.$message(res.data);
       });
     },
     productReinit() {
       this.editableTabsValue = "0";
-      this.product = [
-        {
-          Imgs: [],
-          price: null,
-          name: "",
-          stock: "limited",
-          quantity: 10
-        }
-      ];
+      this.product = {
+        name: "",
+        img: {},
+        options: [
+          {
+            Imgs: [],
+            price: null,
+            name: "",
+            stock: "limited",
+            quantity: 10
+          }
+        ]
+      };
     },
     getImg(i) {
       this.edit = i;
@@ -118,8 +157,12 @@ export default {
       });
     },
     imgDel(i) {
-      let index = this.editableTabsValue;
-      this.product[index].Imgs.splice(i, 1);
+      if (i === -2) {
+        this.product.img = {};
+      } else {
+        let index = this.editableTabsValue;
+        this.product.options[index].Imgs.splice(i, 1);
+      }
     },
     imgsel(val) {
       console.log("imgsel" + val);
@@ -127,20 +170,26 @@ export default {
         return;
       }
       let index = this.editableTabsValue;
-      if (this.edit === -1) {
-        this.product[index].Imgs.push(this.imgdata[val]);
+      if (this.edit === -2) {
+        this.product.img = this.imgdata[val];
+      } else if (this.edit === -1) {
+        this.product.options[index].Imgs.push(this.imgdata[val]);
       } else {
-        this.product[index].Imgs.splice(this.edit, 1, this.imgdata[val]);
+        this.product.options[index].Imgs.splice(
+          this.edit,
+          1,
+          this.imgdata[val]
+        );
       }
       this.imgDialog = false;
     },
 
     imgpageChange(val) {
       this.imgPagination.currentPage = val;
-      this.getImg();
+      this.getImg(this.edit);
     },
     addOptions() {
-      this.product.push({
+      this.product.options.push({
         Imgs: [],
         price: null,
         name: "",
@@ -150,7 +199,7 @@ export default {
     },
     removeTab(targetName) {
       let index = parseInt(targetName);
-      if (this.product.length > 1) {
+      if (this.product.options.length > 1) {
         this.$confirm("此操作将删除当前选项, 是否继续?", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -158,7 +207,7 @@ export default {
         })
           .then(() => {
             this.editableTabsValue = "0";
-            this.product.splice(index, 1);
+            this.product.options.splice(index, 1);
             this.$message({
               type: "success",
               message: "删除成功!"

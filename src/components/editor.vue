@@ -1,90 +1,89 @@
 <template>
-	<div v-if="title!==''" class="editor-page">
-		<div class="tab">
-			<span :class="{'active':'en'===editlang}" @click="setLang('en')">English</span>
-			<span :class="{'active':'zh'===editlang}" @click="setLang('zh')">中文</span>
-		</div>
-		<h4>{{$t(title)}}</h4>
+  <div v-if="title!==''" class="editor-page">
+    <!-- <div class="tab">
+      <span :class="{'active':'en'===editlang}" @click="setLang('en')">English</span>
+      <span :class="{'active':'zh'===editlang}" @click="setLang('zh')">中文</span>
+    </div> -->
+    <h4>{{$t(title)}}</h4>
 
-		<!-- <h6>
+    <!-- <h6>
 			<span :class="{'active':editlang==='en'}" @click="setlang('en')">EN</span>
 			<span :class="{'active':editlang==='zh'}" @click="setlang('zh')">中</span>
 		</h6> -->
-		<component class="edit" :class="{'onedit':onEdit}" :storesData="storesData" :block="block" v-bind:is="block.type+'Editor'"></component>
-	</div>
+    <component class="edit" :class="{'onedit':onEdit}" :block="block" v-bind:is="block.type+'Editor'"></component>
+  </div>
 </template>
 
 <script>
-import cellEditor from '@/edit/cellEditor'
-import titleEditor from '@/edit/titleEditor'
-import swiperEditor from '@/edit/swiperEditor'
-import spacerEditor from '@/edit/spacerEditor'
-import productgroupEditor from '@/edit/productEditor'
-import navgroupEditor from '@/edit/navgroupEditor'
-import headerEditor from '@/edit/headerEditor'
-import { doPost, doGet } from '@/api/api'
+import cellEditor from "@/edit/cellEditor";
+import titleEditor from "@/edit/titleEditor";
+import swiperEditor from "@/edit/swiperEditor";
+import spacerEditor from "@/edit/spacerEditor";
+import productgroupEditor from "@/edit/productEditor";
+import navgroupEditor from "@/edit/navgroupEditor";
+import headerEditor from "@/edit/headerEditor";
+import { doPost, doGet } from "@/api/api";
 
 export default {
-	props: {
-		block: {
-			type: Object,
-		},
-		onEdit: {
-			type: Boolean,
-		}
-	},
-	mounted() {
-		this.shoppingmallStoresGet();
-	},
-	data() {
-		return {
-			storesData: {
-				storesList: [],
-				storeId: '',
-			}
-		}
-	},
-	methods: {
-		setLang(lang) {
-			this.$store.dispatch('setEditlang', lang)
-		},
-
-		shoppingmallStoresGet() {
-			doGet(`shopping-malls/${this.shoppingMallId}/stores`, { p: 0 }).then(res => {
-				this.storesData = {
-					storesList: res.data,
-					storeId: res.data[0]['_id'],
-				}
-			})
-		}
-	},
-	computed: {
-		title() {
-			let title = '';
-			switch (this.block.type) {
-				// case 'cell': title = '导航条'; break;
-				case 'productgroup': title = 'BTN_PRODUCTGROUP'; break;
-				case 'spacer': title = 'BTN_SPACER'; break;
-				case 'banner': title = 'BTN_BANNER'; break;
-				case 'title': title = 'BTN_TITLE'; break;
-				case 'navgroup': title = 'BTN_NAVGROUP'; break;
-				case 'header': title = 'BTN_HEADER'; break;
-
-			}
-			return title;
-		}
-	},
-	components: {
-		cellEditor,
-		spacerEditor,
-		productgroupEditor,
-		bannerEditor: swiperEditor,
-		navgroupEditor,
-		titleEditor,
-		headerEditor
-	},
-
-}
+  props: {
+    block: {
+      type: Object
+    },
+    onEdit: {
+      type: Boolean
+    }
+  },
+  mounted() {},
+  data() {
+    return {
+      storesData: {
+        storesList: [],
+        storeId: ""
+      }
+    };
+  },
+  methods: {
+    setLang(lang) {
+      this.$store.dispatch("setEditlang", lang);
+    }
+  },
+  computed: {
+    title() {
+      let title = "";
+      switch (this.block.type) {
+        // case 'cell': title = '导航条'; break;
+        case "productgroup":
+          title = "BTN_PRODUCTGROUP";
+          break;
+        case "spacer":
+          title = "BTN_SPACER";
+          break;
+        case "banner":
+          title = "BTN_BANNER";
+          break;
+        case "title":
+          title = "BTN_TITLE";
+          break;
+        case "navgroup":
+          title = "BTN_NAVGROUP";
+          break;
+        case "header":
+          title = "BTN_HEADER";
+          break;
+      }
+      return title;
+    }
+  },
+  components: {
+    cellEditor,
+    spacerEditor,
+    productgroupEditor,
+    bannerEditor: swiperEditor,
+    navgroupEditor,
+    titleEditor,
+    headerEditor
+  }
+};
 </script>
 
 <style lang="scss" scoped>

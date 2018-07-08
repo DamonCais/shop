@@ -1,6 +1,15 @@
 <template>
 	<div>
 		<el-dialog class="dialog" :title="title" :visible.sync="show" width="70%">
+			<!-- 选择商店 -->
+			<div v-show="title==='选择商品'" class="row">
+				<span>{{$t('PRODUCTSEL_STORE_SELECT')}}:</span>
+				<el-select @change="storeIdChange" v-model="storesData.storeId" placeholder="请选择">
+					<el-option v-for="item in storesData.storesList" :key="item._id" :label="item.name" :value="item._id">
+					</el-option>
+				</el-select>
+				<span>{{$t('PRODUCTSEL_PRODUCT_SELECT_QUANTITY')}}：{{quantity}}</span>
+			</div>
 			<!-- 列表显示 -->
 			<el-table class="table rowClick" @row-click="rowClick" ref="multipleTable" v-if="show" :data="gridData" height="500" @select-all="handleSelectionChange" @select="handleSelectionChange">
 				<el-table-column width="55" v-if="!multi" fixed>
@@ -15,9 +24,9 @@
 				<el-table-column v-for="(item,index) in showData" :key="index" :sortable="item.sortable" :label="item.label">
 					<template slot-scope="scope">
 						<div>
-							<img v-if="item.type ==='image'" :src="'dist/'+_(scope.row,(item.prop))" alt="" style="width: 50px;height: 50px">
+							<img v-if="item.type ==='image'" :src="scope.row|deepGet(item.prop)" alt="" style="width: 50px;height: 50px">
 							<span v-if="item.type ==='string'">{{scope.row|deepGet(item.prop)}}</span>
-							<span v-if="item.type ==='price'">{{'￥'+_(scope.row,item.prop)}}</span>
+							<span v-if="item.type ==='price'">{{'￥'+scope.row[item.prop]/100}}</span>
 
 							<span v-if="item.type ==='lang'">
 								<span v-if="_(scope.row,item.prop+'.'+editlang)">
@@ -74,7 +83,7 @@ export default {
       sel: -1,
       multipleSelection: [],
       picked: {},
-      temporarySelection: [],
+      temporarySelection: {},
       quantity: 0
     };
   },
@@ -83,23 +92,56 @@ export default {
       this.$emit("sortChange", 1);
     },
     productsel() {
-      console.log(this.temporarySelection);
-      this.$emit("productsel", this.temporarySelection);
-      this.temporarySelection = [];
+      if (!this.multi) {
+        this.multipleSelection[0] = this.picked;
+      } else {
+        for (var key in this.temporarySelection) {
+          this.temporarySelection[key].forEach(element => {
+            this.multipleSelection.push(...element);
+          });
+        }
+      }
+      this.temporarySelection = {};
+      this.$emit("productsel", this.multipleSelection);
+      this.multipleSelection = [];
       this.quantity = 0;
     },
     handleSelectionChange(selection, row) {
       console.log(selection);
+      if (!this.temporarySelection[this.storesData["storeId"]]) {
+        this.temporarySelection[this.storesData["storeId"]] = [];
+      }
 
-      this.temporarySelection = selection;
+      this.temporarySelection[this.storesData["storeId"]][
+        this.pagination["currentPage"]
+      ] = selection;
+      this.quantityCalculate();
     },
-
+    quantityCalculate() {
+      let q = 0;
+      for (var key in this.temporarySelection) {
+        this.temporarySelection[key].forEach(element => {
+          q += element.length;
+        });
+      }
+      this.quantity = q;
+    },
     handleCurrentChange(val) {
       this.$emit("sortChange", val);
     },
     toggleSelection() {
+      if (
+        !this.temporarySelection[this.storesData["storeId"]] ||
+        !this.temporarySelection[this.storesData["storeId"]][
+          this.pagination["currentPage"]
+        ]
+      ) {
+        return;
+      }
       let ids = [];
-      this.temporarySelection.forEach(element => {
+      this.temporarySelection[this.storesData["storeId"]][
+        this.pagination["currentPage"]
+      ].forEach(element => {
         ids.push(element["_id"]);
       });
       let obj = this.gridData.filter(d => ids.indexOf(d._id) !== -1);
@@ -108,23 +150,43 @@ export default {
       });
     },
     rowClick(row) {
-      let index = this.temporarySelection.findIndex(
-        item => item._id === row._id
-      );
-      if (index === -1) {
-        this.temporarySelection.push(row);
-      } else {
-        this.temporarySelection = this.temporarySelection.filter(
-          item => item._id !== row._id
-        );
+      console.log(row);
+      if (!this.temporarySelection[this.storesData["storeId"]]) {
+        this.temporarySelection[this.storesData["storeId"]] = [];
       }
+      if (
+        !this.temporarySelection[this.storesData["storeId"]][
+          this.pagination["currentPage"]
+        ]
+      ) {
+        this.temporarySelection[this.storesData["storeId"]][
+          this.pagination["currentPage"]
+        ] = [];
+      }
+      let tempSelection = this.temporarySelection[this.storesData["storeId"]][
+        this.pagination["currentPage"]
+      ];
+      let selection = this.temporarySelection[this.storesData["storeId"]][
+        this.pagination["currentPage"]
+      ].filter(r => r._id !== row._id);
+      if (tempSelection.length === selection.length) {
+        this.temporarySelection[this.storesData["storeId"]][
+          this.pagination["currentPage"]
+        ].push(row);
+      } else {
+        this.temporarySelection[this.storesData["storeId"]][
+          this.pagination["currentPage"]
+        ] = selection;
+      }
+      this.quantityCalculate();
       this.$refs.multipleTable.toggleRowSelection(row);
+
       // this.toggleSelection();
     }
   },
   watch: {
     show(val) {
-      this.temporarySelection = [];
+      this.temporarySelection = {};
       if (!val) {
         this.pagination.currentPage = 1;
       }

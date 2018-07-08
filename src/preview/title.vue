@@ -1,7 +1,7 @@
 <template>
 	<div class="title">
-		<h4>{{block.items[0].title[editlang]}}</h4>
-		<h5>{{block.items[0].subtitle[editlang]}}</h5>
+		<h4>{{block.items[0].title}}</h4>
+		<h5>{{block.items[0].subtitle}}</h5>
 		<span v-show="block.items[0].linkType" class="link">
 			<i class="el-icon-arrow-right"></i>
 		</span>

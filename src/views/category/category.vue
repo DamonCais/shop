@@ -11,19 +11,19 @@
 			<!-- 表单 -->
 			<el-form ref="form" class="form" label-width="80px">
 				<el-form-item :label="$t('CATEGORY_NAME')">
-					<el-input :placeholder="editlang==='en'?'please input':'请输入分组名称'" v-model="categoryData.name[editlang]"></el-input>
+					<el-input :placeholder="editlang==='en'?'please input':'请输入分组名称'" v-model="categoryData.name"></el-input>
 				</el-form-item>
 				<el-form-item :label="$t('CATEGORY_DESCRIPTION')">
-					<el-input :placeholder="editlang==='en'?'please input':'请输入分组描述'" v-model="categoryData.description[editlang]"></el-input>
+					<el-input :placeholder="editlang==='en'?'please input':'请输入分组描述'" v-model="categoryData.description"></el-input>
 				</el-form-item>
 				<el-form-item :label="$t('CATEGORY_META_DESCRIPTION')">
-					<el-input :placeholder="editlang==='en'?'please input':'请输入页面描述'" v-model="categoryData.metaDescription[editlang]"></el-input>
+					<el-input :placeholder="editlang==='en'?'please input':'请输入页面描述'" v-model="categoryData.metaDescription"></el-input>
 				</el-form-item>
 				<el-form-item :label="$t('CATEGORY_WECHAT_SHARE')">
-					<el-input :placeholder="editlang==='en'?'please input':'请输入微信分享'" v-model="categoryData.weixinShareTitle[editlang]"></el-input>
+					<el-input :placeholder="editlang==='en'?'please input':'请输入微信分享'" v-model="categoryData.weixinShareTitle"></el-input>
 				</el-form-item>
 				<el-form-item :label="$t('CATEGORY_WECHAT_DESCRIPTION')">
-					<el-input :placeholder="editlang==='en'?'please input':'请输入微信描述'" v-model="categoryData.weixinShareDescription[editlang]"></el-input>
+					<el-input :placeholder="editlang==='en'?'please input':'请输入微信描述'" v-model="categoryData.weixinShareDescription"></el-input>
 				</el-form-item>
 				<el-form-item :label="$t('CATEGORY_TABINDEX')">
 					<el-input-number v-model="categoryData.sortIndex" :min="0" :max="10"></el-input-number>

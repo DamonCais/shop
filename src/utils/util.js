@@ -12,8 +12,8 @@ export function BlockToPage(blocks) {
 export function PageToBlock(data) {
   const blocks = []
   blocks[0] = {
-    pageTitle: typeof (data.pageTitle) === 'object' ? data.pageTitle : { zh: '', en: '' },
-    pageDescription: typeof (data.pageDescription) === 'object' ? data.pageDescription : { zh: '', en: '' },
+    pageTitle: typeof (data.pageTitle) === 'string' ? data.pageTitle : '文本框架',
+    pageDescription: typeof (data.pageDescription) === 'string' ? data.pageDescription : '文本标题',
     sortIndex: typeof (data.sortIndex) === 'number' ? data.sortIndex : 0,
     type: 'header'
   }
@@ -32,31 +32,21 @@ export function createObjByBtn(btn) {
           image: {
             url: 'https://img.yzcdn.cn/public_files/2018/01/30/585dae8447d80013ef9344adc973c6ee.png?imageView2/2/w/520/h/0/q/75/format/webp'
           },
-          title: {
-            zh: '文本标题',
-            en: 'English Title'
-          }
+          title: '文本标题'
         },
         {
           image: {
             url: 'https://img.yzcdn.cn/public_files/2018/01/30/585dae8447d80013ef9344adc973c6ee.png?imageView2/2/w/520/h/0/q/75/format/webp'
           },
-          title: {
-            zh: '文本标题',
-            en: 'English Title'
-          }
+          title: '文本标题'
         },
         {
           image: {
             url: 'https://img.yzcdn.cn/public_files/2018/01/30/585dae8447d80013ef9344adc973c6ee.png?imageView2/2/w/520/h/0/q/75/format/webp'
           },
-          title: {
-            zh: '文本标题',
-            en: 'English Title'
-          }
+          title: '文本标题'
         }
         ]
-
       }
       break
     case 'BTN_BANNER':
@@ -78,14 +68,8 @@ export function createObjByBtn(btn) {
         template: 'left',
 
         items: [{
-          title: {
-            zh: '文本标题',
-            en: 'English Title'
-          },
-          subtitle: {
-            zh: '文本副标题',
-            en: 'English Subtitle'
-          }
+          title: '文本标题',
+          subtitle: '文本标题'
           // linkType: "product",
           // linkId: "...object-id..."
         }]

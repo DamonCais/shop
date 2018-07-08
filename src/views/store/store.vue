@@ -4,7 +4,7 @@
 			<img class="logo" :src="logo" alt="">
 			<h5 class="title">
 
-				{{$t('STORE_NAME')}} ：{{storeName[editlang]}}
+				{{$t('STORE_NAME')}} ：{{storeName}}
 			</h5>
 			<!-- <el-button @click="productAdd" type="success">Add Product</el-button> -->
 			<div class="clearfix"></div>

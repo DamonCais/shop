@@ -5,7 +5,7 @@
 			<header class="header" @click="sel=0">
 				<h1>
 					<span>
-						{{blocks[0].pageTitle[editlang]===''?'此处应填入店铺主页标题':blocks[0].pageTitle[editlang]}}
+						{{blocks[0].pageTitle===''?'此处应填入店铺主页标题':blocks[0].pageTitle}}
 					</span>
 				</h1>
 			</header>
@@ -13,7 +13,7 @@
 				<!-- 页面显示 -->
 				<draggable :options="dragOptions" v-model="blocks" :move="getdata" @update="datadragEnd">
 					<div ref="pre" class="pre" v-for="(pre,index) in blocks" :key="index" v-if="index" @click="getSel(index)">
-						<preview ref="preview" @blockChange="blockChange= blockWatchOn&&true" :block="pre" :onEdit="sel===index" />
+						<preview ref="preview" :block="pre" :onEdit="sel===index" />
 						<span @click.stop="del" v-show="sel===index" class="del">删除</span>
 						<span @click="push" v-show="sel===index" class="add push">
 							<i class="el-icon-circle-plus"></i>
@@ -52,190 +52,158 @@
 </template>
 
 <script>
-import { Message } from 'element-ui'
-import preview from "@/components/preview"
-import draggable from 'vuedraggable'
-import editor from '@/components/editor'
-import { createObjByBtn, PageToBlock, BlockToPage } from '@/utils/util'
-import { doPost, doGet, doPatch } from '@/api/api'
-import foot from './foot'
+import { Message } from "element-ui";
+import preview from "@/components/preview";
+import draggable from "vuedraggable";
+import editor from "@/components/editor";
+import { createObjByBtn, PageToBlock, BlockToPage } from "@/utils/util";
+import { doPost, doGet, doPatch } from "@/api/api";
+import foot from "./foot";
 export default {
-	mounted() {
-		if (this.$route.params.id === 'add') {
-			this.uploadType = 'add';
-			return;
-		}
-		this.uploadType = 'update'
-		this.pageGet(this.$route.params.id);
-	},
-	beforeRouteLeave(to, from, next) {
-		// 导航离开该组件的对应路由时调用
-
-		console.log(JSON.stringify(this.blocks[0]))
-		console.log(this.header)
-		console.log(this.blockChange);
-		if (this.blockChange || JSON.stringify(this.blocks[0]) !== (this.header)) {
-
-			this.$confirm(this.$t('PAGE_HAVE_UPDATE'), this.$t('PAGE_TIPS'), {
-				confirmButtonText: this.$t('PAGE_CONFIRM'),
-				cancelButtonText: this.$t('PAGE_CANCEL'),
-				type: 'warning'
-			}).then(() => {
-				this.upload();
-				next({ path: from.path });
-
-			}).catch(() => {
-				this.$message({
-					type: 'info',
-					message: '已取消'
-				});
-				next();
-			});
-		} else {
-			next();
-
-		}
-
-	},
-	data() {
-		return {
-			btnType: 'edit',
-			centerDialogVisible: false,
-			dragOptions: {
-				animation: 120,
-				scroll: true,
-				group: 'sortlist',
-				ghostClass: 'ghost-style'
-			},
-			btns: ['BTN_NAVGROUP', 'BTN_BANNER', 'BTN_TITLE', 'BTN_PRODUCTGROUP', 'BTN_SPACER'],
-			blocks: [
-				{
-					pageTitle: { zh: '', en: '' },
-					pageDescription: { zh: '', en: '' },
-					sortIndex: 0,
-					type: 'header'
-				}
-			],
-			header: '',
-			sel: 0,
-			editOffset: -50,
-			uploadType: 'add',
-			blockChange: false,
-			blockWatchOn: false,
-		}
-	},
-	methods: {
-		pageGet(id) {
-			doGet(`shopping-malls/${this.shoppingMallId}/pages/` + id).then(res => {
-				console.log(res.data);
-				this.header = JSON.stringify({
-					pageTitle: res.data.pageTitle,
-					pageDescription: res.data.pageDescription,
-					sortIndex: res.data.sortIndex,
-					type: 'header'
-				})
-				this.blocks = PageToBlock(res.data);
-				this.$store.commit('SET_BREAD', res.data.pageTitle['en'])
-			}).then(() => {
-				this.blockWatchOn = true;
-			})
-		},
-		preview() {
-			this.$router.push({ path: '/preview/' + this.$route.params.id })
-		},
-		upload() {
-			let obj = BlockToPage(this.blocks);
-			// obj.shoppingMall = this.shoppingMallId
-			if (obj.pageTitle.en === '') {
-				Message.error('页面标题不能为空');
-				return;
-			}
-			this.header = JSON.stringify(this.blocks[0]);
-			this.blockChange = false;
-			if (this.uploadType === 'add') {
-				doPost(`shopping-malls/${this.shoppingMallId}/pages`, obj).then(res => {
-					this.$message({
-						message: 'save success',
-						type: 'success'
-					})
-					this.uploadType = 'update';
-					this.$router.push({ path: '/pages/' + res.data['_id'] })
-					console.log(this.$route.params.id);
-				})
-			} else {
-				doPatch(`shopping-malls/${this.shoppingMallId}/pages/` + this.$route.params.id, obj).then(res => {
-					if (res.status === 200) {
-						this.$message({
-							message: 'update success',
-							type: 'success'
-						})
-					}
-				})
-			}
-		},
-		selbtn(btn) {
-			this.centerDialogVisible = false;
-			let obj = createObjByBtn(btn);
-			switch (this.btnType) {
-				case 'edit':
-					this.blocks.push(obj);
-					this.sel = this.blocks.length - 1;
-					break;
-				case 'insert':
-					this.blocks.splice(this.sel, 0, obj);
-					break;
-				case 'push':
-					this.blocks.splice(this.sel + 1, 0, obj);
-					this.sel = this.sel + 1;
-					break;
-			}
-			this.btnType = 'edit';
-		},
-		getSel(index) {
-			this.sel = index;
-		},
-		edit(btn) {
-			this.btnType = 'edit';
-			this.selbtn(btn);
-		},
-		del() {
-			this.blocks.splice(this.sel, 1);
-			this.sel = this.sel - 1;
-		},
-		push() {
-			this.btnType = 'push';
-			this.centerDialogVisible = true;
-		},
-		insert() {
-			this.btnType = 'insert';
-			this.centerDialogVisible = true;
-		},
-		getdata(evt) {
-			this.sel = evt.draggedContext.index;
-		},
-		datadragEnd(evt) {
-			this.sel = evt.newIndex + 1;
-		}
-	},
-	watch: {
-		sel(val) {
-			if (!val) {
-				this.editOffset = this.$refs.pre[0].offsetTop - 50;
-				return;
-			}
-			setTimeout(() => {
-				if (!this.$refs.pre[val - 1]) { return; }
-				this.editOffset = this.$refs.pre[val - 1].offsetTop;
-			}, 20);
-		},
-	},
-	components: {
-		preview,
-		draggable,
-		editor,
-		foot
-	}
-}
+  mounted() {
+    if (this.$route.params.id === "add") {
+      this.uploadType = "add";
+      return;
+    }
+    this.uploadType = "update";
+    this.pageGet(this.$route.params.id);
+  },
+  data() {
+    return {
+      btnType: "edit",
+      centerDialogVisible: false,
+      dragOptions: {
+        animation: 120,
+        scroll: true,
+        group: "sortlist",
+        ghostClass: "ghost-style"
+      },
+      btns: [
+        "BTN_NAVGROUP",
+        "BTN_BANNER",
+        "BTN_TITLE",
+        "BTN_PRODUCTGROUP",
+        "BTN_SPACER"
+      ],
+      blocks: [
+        {
+          pageTitle: "文本标题",
+          pageDescription: "文本描述",
+          sortIndex: 0,
+          type: "header"
+        }
+      ],
+      header: "",
+      sel: 0,
+      editOffset: -50,
+      uploadType: "add",
+      blockChange: false,
+      blockWatchOn: false
+    };
+  },
+  methods: {
+    pageGet(id) {
+      if (id === "add") {
+        return;
+      }
+      doGet(`/page.get`, { id: this.$route.params.id }).then(res => {
+        let page = res.data.pages[0];
+        this.header = JSON.stringify({
+          pageTitle: page.pageTitle,
+          pageDescription: page.pageDescription,
+          sortIndex: page.sortIndex,
+          type: "header"
+        });
+        this.blocks = PageToBlock(page);
+        // this.$store.commit('SET_BREAD', res.data.pageTitle['en'])
+      });
+    },
+    preview() {
+      this.$router.push({ path: "/preview/" + this.$route.params.id });
+    },
+    upload() {
+      let obj = BlockToPage(this.blocks);
+      // obj.shoppingMall = this.shoppingMallId
+      this.header = JSON.stringify(this.blocks[0]);
+      doPost(`/page.add`, { page: obj, id: this.$route.params.id }).then(
+        res => {
+          this.$message({
+            message: "save success",
+            type: "success"
+          });
+          if (this.$route.params.id === "add") {
+            this.uploadType = "update";
+            this.$router.push({ path: "/pages/" + res.data["_id"] });
+            location.reload();
+          }
+        }
+      );
+    },
+    selbtn(btn) {
+      this.centerDialogVisible = false;
+      let obj = createObjByBtn(btn);
+      switch (this.btnType) {
+        case "edit":
+          this.blocks.push(obj);
+          this.sel = this.blocks.length - 1;
+          break;
+        case "insert":
+          this.blocks.splice(this.sel, 0, obj);
+          break;
+        case "push":
+          this.blocks.splice(this.sel + 1, 0, obj);
+          this.sel = this.sel + 1;
+          break;
+      }
+      this.btnType = "edit";
+    },
+    getSel(index) {
+      this.sel = index;
+    },
+    edit(btn) {
+      this.btnType = "edit";
+      this.selbtn(btn);
+    },
+    del() {
+      this.blocks.splice(this.sel, 1);
+      this.sel = this.sel - 1;
+    },
+    push() {
+      this.btnType = "push";
+      this.centerDialogVisible = true;
+    },
+    insert() {
+      this.btnType = "insert";
+      this.centerDialogVisible = true;
+    },
+    getdata(evt) {
+      this.sel = evt.draggedContext.index;
+    },
+    datadragEnd(evt) {
+      this.sel = evt.newIndex + 1;
+    }
+  },
+  watch: {
+    sel(val) {
+      if (!val) {
+        this.editOffset = this.$refs.pre[0].offsetTop - 50;
+        return;
+      }
+      setTimeout(() => {
+        if (!this.$refs.pre[val - 1]) {
+          return;
+        }
+        this.editOffset = this.$refs.pre[val - 1].offsetTop;
+      }, 20);
+    }
+  },
+  components: {
+    preview,
+    draggable,
+    editor,
+    foot
+  }
+};
 </script>
 
 <style lang="scss" scoped>

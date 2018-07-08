@@ -5,29 +5,28 @@
 </template>
 
 <script>
-import axios from 'axios'
-import preview from './preview'
+import preview from "./preview";
+import { doPost, doGet, doPatch } from "@/api/api";
 export default {
-	mounted() {
-		this.pageGet();
-	},
-	data() {
-		return {
-			blocks: [],
-		}
-	},
-	methods: {
-		pageGet() {
-			axios.get(`https://mp-dev.guzzu.cn/v3/frontapi/shopping-malls/${this.shoppingMallId}/pages/${this.$route.params.id}`).then(res => {
-				console.log(res);
-				this.blocks = res.data.blocks;
-			})
-		}
-	},
-	components: {
-		preview,
-	}
-}
+  mounted() {
+    this.pageGet();
+  },
+  data() {
+    return {
+      blocks: []
+    };
+  },
+  methods: {
+    pageGet() {
+      doGet("/page.get", { id: this.$route.params.id }).then(res => {
+        this.blocks = res.data.pages[0].blocks;
+      });
+    }
+  },
+  components: {
+    preview
+  }
+};
 </script>
 
 <style lang="scss" scoped>
